@@ -1,0 +1,542 @@
+/* Media Notepad — Windows 11 Notepad inspired dark/light chrome */
+
+:root {
+  --editor-size: 15px;
+  --editor-font: "Cascadia Mono", "Consolas", "Courier New", ui-monospace, monospace;
+
+  --bg: #1e1e1e;
+  --bg-chrome: #202020;
+  --bg-tab: #262626;
+  --bg-tab-active: #1e1e1e;
+  --bg-menu: #2b2b2b;
+  --bg-hover: rgba(255, 255, 255, 0.07);
+  --bg-pressed: rgba(255, 255, 255, 0.12);
+  --text: #e8e8e8;
+  --muted: #9a9a9a;
+  --border: #3a3a3a;
+  --accent: #4cc2ff;
+  --danger: #ff7b72;
+  --selection: rgba(76, 194, 255, 0.28);
+  --shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-chrome: #f3f3f3;
+  --bg-tab: #e8e8e8;
+  --bg-tab-active: #ffffff;
+  --bg-menu: #fbfbfb;
+  --bg-hover: rgba(0, 0, 0, 0.06);
+  --bg-pressed: rgba(0, 0, 0, 0.1);
+  --text: #1a1a1a;
+  --muted: #5f5f5f;
+  --border: #dcdcdc;
+  --accent: #0067c0;
+  --danger: #c42b1c;
+  --selection: rgba(0, 103, 192, 0.22);
+  --shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+::selection {
+  background: var(--selection);
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+}
+
+/* ---------------- Tab strip ---------------- */
+
+.tabbar {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 40px;
+  flex: 0 0 40px;
+  padding: 6px 6px 0;
+  background: var(--bg-chrome);
+  border-bottom: 1px solid var(--border);
+}
+
+.tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  max-width: 100%;
+  height: 100%;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  max-width: 210px;
+  min-width: 110px;
+  height: 33px;
+  padding: 0 6px 0 12px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12.5px;
+  cursor: default;
+  position: relative;
+  top: 1px;
+}
+
+.tab:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.tab.active {
+  background: var(--bg-tab-active);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.tab.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: var(--bg-tab-active);
+}
+
+.tab-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+.tab.dragging {
+  opacity: 0.45;
+}
+
+.tab.drop-before {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.tab.drop-after {
+  box-shadow: inset -3px 0 0 var(--accent);
+}
+
+.tab-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: inherit;
+  opacity: 0;
+  cursor: default;
+}
+
+.tab:hover .tab-close,
+.tab.active .tab-close {
+  opacity: 0.75;
+}
+
+.tab-close:hover {
+  background: var(--bg-pressed);
+  opacity: 1;
+}
+
+.tab-close svg {
+  width: 11px;
+  height: 11px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.new-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  margin-bottom: 2px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: default;
+}
+
+.new-tab:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.new-tab svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* ---------------- Menu bar ---------------- */
+
+.menubar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 32px;
+  flex: 0 0 32px;
+  padding: 0 6px;
+  background: var(--bg-chrome);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  z-index: 20;
+}
+
+.menu {
+  position: relative;
+}
+
+.menu-btn {
+  height: 26px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: default;
+}
+
+.menu-btn:hover,
+.menu-btn.open {
+  background: var(--bg-hover);
+}
+
+.menu-panel {
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 0;
+  min-width: 250px;
+  padding: 5px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-menu);
+  box-shadow: var(--shadow);
+  z-index: 30;
+}
+
+.menu-panel[hidden] {
+  display: none;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 30px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 12.5px;
+  text-align: left;
+  cursor: default;
+}
+
+.menu-item:hover:not(:disabled) {
+  background: var(--bg-hover);
+}
+
+.menu-item:disabled {
+  opacity: 0.45;
+}
+
+.menu-item .check {
+  width: 14px;
+  flex: 0 0 14px;
+  text-align: center;
+  color: var(--accent);
+}
+
+.menu-item .label {
+  flex: 1;
+  white-space: nowrap;
+}
+
+.menu-item .shortcut {
+  color: var(--muted);
+  font-size: 11.5px;
+}
+
+.menu-sep {
+  height: 1px;
+  margin: 5px 7px;
+  background: var(--border);
+}
+
+/* ---------------- Editor ---------------- */
+
+.editor {
+  position: relative;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 14px 22px 120px;
+  outline: none;
+  font-family: var(--editor-font);
+  font-size: var(--editor-size);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  tab-size: 4;
+  -webkit-user-select: text;
+  user-select: text;
+  caret-color: var(--accent);
+}
+
+.editor.no-wrap {
+  white-space: pre;
+  overflow-x: auto;
+}
+
+.editor.is-empty::before {
+  content: attr(data-placeholder);
+  position: absolute;
+  top: 14px;
+  left: 22px;
+  right: 22px;
+  color: var(--muted);
+  opacity: 0.7;
+  pointer-events: none;
+  font-family: var(--editor-font);
+}
+
+.editor img,
+.editor video {
+  display: block;
+  max-width: 100%;
+  max-height: 70vh;
+  height: auto;
+  margin: 10px 0;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.editor video {
+  max-height: 520px;
+  background: #000;
+}
+
+.editor audio {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  margin: 10px 0;
+}
+
+.editor img {
+  cursor: default;
+}
+
+/* ---------------- Status bar ---------------- */
+
+.statusbar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  height: 26px;
+  flex: 0 0 26px;
+  padding: 0 14px;
+  background: var(--bg-chrome);
+  border-top: 1px solid var(--border);
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.status-item {
+  white-space: nowrap;
+}
+
+.save-state.ok {
+  color: #6ccb5f;
+}
+
+.save-state.busy {
+  color: var(--muted);
+}
+
+.save-state.error {
+  color: var(--danger);
+}
+
+/* ---------------- Modal ---------------- */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 100;
+}
+
+.modal-backdrop[hidden] {
+  display: none;
+}
+
+.modal {
+  width: min(380px, calc(100vw - 48px));
+  padding: 20px 20px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-menu);
+  box-shadow: var(--shadow);
+}
+
+.modal-title {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.modal-text {
+  margin: 0 0 18px;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btn {
+  min-width: 84px;
+  height: 30px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--bg-tab);
+  color: var(--text);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: default;
+}
+
+.btn:hover {
+  background: var(--bg-hover);
+}
+
+.btn.danger {
+  border-color: transparent;
+  background: #c42b1c;
+  color: #fff;
+}
+
+.btn.danger:hover {
+  background: #d63b2b;
+}
+
+/* ---------------- Toast ---------------- */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 44px;
+  transform: translate(-50%, 12px);
+  max-width: 70vw;
+  padding: 9px 16px;
+  border-radius: 8px;
+  background: var(--bg-menu);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 12.5px;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.16s ease, transform 0.16s ease;
+  z-index: 120;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* ---------------- Scrollbars ---------------- */
+
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(128, 128, 128, 0.45);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(128, 128, 128, 0.7);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}

@@ -1,0 +1,62 @@
+{
+  "productName": "Media Notepad",
+  "version": "1.0.0",
+  "identifier": "com.medianotepad.desktop",
+  "build": {
+    "frontendDist": "../src"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "Media Notepad",
+        "width": 1100,
+        "height": 760,
+        "minWidth": 520,
+        "minHeight": 380,
+        "center": true,
+        "dragDropEnabled": false,
+        "theme": "Dark"
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self' ipc: http://ipc.localhost; img-src 'self' asset: http://asset.localhost blob: data:; media-src 'self' asset: http://asset.localhost blob: data:; style-src 'self' 'unsafe-inline'; script-src 'self'",
+      "assetProtocol": {
+        "enable": true,
+        "scope": []
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "publisher": "Media Notepad",
+    "copyright": "Copyright © 2026",
+    "category": "Productivity",
+    "shortDescription": "A lightweight notepad with inline images, video and audio.",
+    "longDescription": "A fast, Notepad-like text editor that lets you paste images, videos and audio straight into your notes. Every note is saved automatically in the application folder.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "resources": ["icons/icon.ico"],
+    "macOS": {
+      "minimumSystemVersion": "10.15"
+    },
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "installerIcon": "icons/icon.ico",
+        "uninstallerIcon": "icons/icon.ico",
+        "installerHooks": "installer-hooks.nsh",
+        "compression": "lzma",
+        "languages": ["English"],
+        "displayLanguageSelector": false,
+        "startMenuFolder": "Media Notepad"
+      }
+    }
+  }
+}

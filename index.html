@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Media Notepad</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app" id="app">
+      <div class="tabbar">
+        <div class="tabs" id="tabs" role="tablist"></div>
+        <button class="new-tab" id="newTabBtn" title="New note (Ctrl+N)" aria-label="New note">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+        </button>
+      </div>
+
+      <div class="menubar" id="menubar"></div>
+
+      <div
+        id="editor"
+        class="editor is-empty"
+        contenteditable="true"
+        spellcheck="false"
+        data-placeholder="Start typing… paste an image or drop a video right here."
+      ></div>
+
+      <footer class="statusbar">
+        <span class="status-item" id="statusLn">Ln 1, Col 1</span>
+        <span class="status-item" id="statusChars">0 characters</span>
+        <span class="spacer"></span>
+        <span class="status-item save-state" id="statusSave">Saved</span>
+        <span class="status-item" id="statusEncoding">UTF-8</span>
+      </footer>
+    </div>
+
+    <input id="filePicker" type="file" accept="image/*,video/*,audio/*" multiple hidden />
+
+    <div class="modal-backdrop" id="modal" hidden>
+      <div class="modal" role="dialog" aria-modal="true">
+        <h2 class="modal-title" id="modalTitle"></h2>
+        <p class="modal-text" id="modalText"></p>
+        <div class="modal-actions">
+          <button class="btn" id="modalCancel" type="button">Cancel</button>
+          <button class="btn danger" id="modalOk" type="button">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="main.js"></script>
+  </body>
+</html>

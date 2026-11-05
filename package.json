@@ -1,0 +1,15 @@
+{
+  "name": "media-notepad",
+  "private": true,
+  "version": "1.0.0",
+  "description": "A lightweight notepad with inline images, video and audio",
+  "type": "module",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.9.1"
+  }
+}
